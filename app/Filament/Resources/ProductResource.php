@@ -139,6 +139,7 @@ class ProductResource extends Resource
                         TextEntry::make('stock')->label('Stock'),
                         TextEntry::make('status')->label('Status'),
                         TextEntry::make('category.name')->label('Category'),
+                        TextEntry::make('description')->label('Description'),
                         TextEntry::make('created_at')->label('Created At'),
                         TextEntry::make('updated_at')->label('Updated At'),
                     ])->columns(2)
