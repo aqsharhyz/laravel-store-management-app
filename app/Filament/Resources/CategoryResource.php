@@ -52,6 +52,7 @@ class CategoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description'),
                 Tables\Columns\TextColumn::make('products_count')
+                    ->label('Total Products')
                     // ->formatStateUsing(function ($state, $record) {
                     //     return $record->products->count();
                     // })
