@@ -58,7 +58,7 @@ class OrderResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\Section::make('s')
+                Forms\Components\Section::make('Order Data')
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('User')
@@ -170,23 +170,12 @@ class OrderResource extends Resource
                             ])
                             ->required(),
 
-                        // Forms\Components\Checkbox::make('user_id_same_as_order')
-                        //     ->label('Same user as order')
-                        //     ->default(false)
-                        //     ->live()
-                        //     ->afterStateUpdated(function (Set $set, Get $get) {
-                        //         $set('user_id', $get('../user_id'));
-                        //     }),
-
                         Forms\Components\Select::make('user_id')
                             ->label('User')
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
-                            // ->visible(fn(Get $get) => $get('user_id_same_as_order') === false)
-                            ->required()
-                            ->disableOptionWhen(fn(Get $get) => $get('user_id_same_as_order') === true),
-                        // ->when(fn(Get $get) => $get('user_id') !== null),
+                            ->required(),
 
                         Forms\Components\TextInput::make('amount')
                             ->label('Amount (Auto-calculated)')
@@ -195,8 +184,29 @@ class OrderResource extends Resource
                             ->minValue(0)
                             ->default(0)
                             ->readonly(),
-
                     ]),
+
+                Forms\Components\Section::make('Shipment')
+                    ->relationship('shipment')
+                    ->schema([
+                        Forms\Components\TextInput::make('tracking_number')
+                            ->label('Tracking Number')
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('shipping_address')
+                            ->label('Shipping Address')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\DateTimePicker::make('estimated_delivery_date')
+                            ->label('Estimated Delivery Date')
+                            ->native(false),
+
+                        Forms\Components\DateTimePicker::make('actual_delivery_date')
+                            ->label('Actual Delivery Date')
+                            ->native(false),
+                    ]),
+
             ]);
     }
 
@@ -204,10 +214,16 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Order ID')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('User')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('order_date')
                     ->label('Order Date')
                     ->dateTime()
@@ -235,13 +251,42 @@ class OrderResource extends Resource
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
+
                 Tables\Columns\TextColumn::make('payment.payment_method')
                     ->label('Payment Method')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('payment.payment_status')
                     ->label('Payment Status')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('payment.amount')
+                    ->label('Payment Amount')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('shipment.tracking_number')
+                    ->label('Tracking Number')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('shipment.shipping_address')
+                    ->label('Shipping Address')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shipment.estimated_delivery_date')
+                    ->label('Estimated Delivery Date')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shipment.actual_delivery_date')
+                    ->label('Actual Delivery Date')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -259,7 +304,9 @@ class OrderResource extends Resource
                         'completed' => 'Completed',
                         'declined' => 'Declined',
                     ]),
-                Tables\Filters\SelectFilter::make('payment.payment_method')
+
+                Tables\Filters\SelectFilter::make('payments')
+                    ->label('Payment Method')
                     ->relationship('payment', 'payment_method')
                     ->options([
                         'Credit Card' => 'Credit Card',
@@ -268,6 +315,7 @@ class OrderResource extends Resource
                         'Cash' => 'Cash',
                     ]),
                 Tables\Filters\SelectFilter::make('payment.payment_status')
+                    ->label('Payment Status')
                     ->relationship('payment', 'payment_status')
                     ->options([
                         'Paid' => 'Paid',
@@ -275,6 +323,7 @@ class OrderResource extends Resource
                         'Failed' => 'Failed',
                         'Refunded' => 'Refunded',
                     ]),
+
                 Filter::make('order_date')
                     ->form([
                         DatePicker::make('order_date_from'),
@@ -342,6 +391,21 @@ class OrderResource extends Resource
                                 TextEntry::make('price_at_purchase')->label('Price at Purchase'),
                             ]),
 
+                    ])->columns(2),
+
+                Section::make('Payment')
+                    ->schema([
+                        TextEntry::make('payment.payment_method')->label('Payment Method'),
+                        TextEntry::make('payment.payment_status')->label('Payment Status'),
+                        TextEntry::make('payment.amount')->label('Payment Amount'),
+                    ])->columns(2),
+
+                Section::make('Shipment')
+                    ->schema([
+                        TextEntry::make('shipment.tracking_number')->label('Tracking Number'),
+                        TextEntry::make('shipment.shipping_address')->label('Shipping Address'),
+                        TextEntry::make('shipment.estimated_delivery_date')->label('Estimated Delivery Date'),
+                        TextEntry::make('shipment.actual_delivery_date')->label('Actual Delivery Date'),
                     ])->columns(2),
             ]);
     }

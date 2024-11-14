@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderDetailResource\Pages;
-use App\Filament\Resources\OrderDetailResource\RelationManagers;
-use App\Models\OrderDetail;
+use App\Filament\Resources\ShipmentResource\Pages;
+use App\Filament\Resources\ShipmentResource\RelationManagers;
+use App\Models\Shipment;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,19 +13,19 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class OrderDetailResource extends Resource
+class ShipmentResource extends Resource
 {
-    protected static ?string $model = OrderDetail::class;
+    protected static ?string $model = Shipment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
 
-    protected static ?string $navigationLabel = 'Order Detail';
+    protected static ?string $navigationLabel = 'Shipment';
 
-    protected static ?string $modelLabel = 'Order Detail';
+    protected static ?string $modelLabel = 'Shipment';
 
     protected static ?string $navigationGroup = 'Order Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -34,15 +34,13 @@ class OrderDetailResource extends Resource
                 Forms\Components\TextInput::make('order_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('product_id')
+                Forms\Components\TextInput::make('shipping_address')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('price_at_purchase')
-                    ->required()
-                    ->numeric(),
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('tracking_number')
+                    ->maxLength(255),
+                Forms\Components\DateTimePicker::make('estimated_delivery_date'),
+                Forms\Components\DateTimePicker::make('actual_delivery_date'),
             ]);
     }
 
@@ -53,14 +51,15 @@ class OrderDetailResource extends Resource
                 Tables\Columns\TextColumn::make('order_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('product_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('shipping_address')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tracking_number')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('estimated_delivery_date')
+                    ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('quantity')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('price_at_purchase')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('actual_delivery_date')
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -94,9 +93,9 @@ class OrderDetailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrderDetails::route('/'),
-            'create' => Pages\CreateOrderDetail::route('/create'),
-            'edit' => Pages\EditOrderDetail::route('/{record}/edit'),
+            'index' => Pages\ListShipments::route('/'),
+            'create' => Pages\CreateShipment::route('/create'),
+            'edit' => Pages\EditShipment::route('/{record}/edit'),
         ];
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shippings', function (Blueprint $table) {
+        Schema::create('shipments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained();
             $table->string('shipping_address');
@@ -20,7 +20,12 @@ return new class extends Migration
             $table->dateTime('actual_delivery_date')->nullable();
             // $table->enum('status', ['pending', 'shipped', 'delivered', 'returned'])->default('pending');
             // $table->enum('shipping_method', ['standard', 'express', 'overnight'])->default('standard');
+            // $table->foreignId('carrier_id')->constrained('carriers')->onDelete('cascade');
             // $table->foreignId('shipper_id')->constrained('shippers')->onDelete('cascade');
+            // $table->text('notes')->nullable();
+            // penyerahan barang ke ekspedisi
+            // $table->dateTime('shipped_at')->nullable();
+            // $table->softDeletes()
             $table->timestamps();
         });
     }
@@ -30,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shippings');
+        Schema::dropIfExists('shipments');
     }
 };
