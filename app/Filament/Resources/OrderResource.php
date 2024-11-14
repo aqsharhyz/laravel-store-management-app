@@ -53,11 +53,55 @@ class OrderResource extends Resource
             }
 
             $set('../../total_price', $totalPrice);
-            // dd($get('../../'));
+            $set('../../payment.amount', $totalPrice);
         }
 
         return $form
             ->schema([
+                Forms\Components\Section::make('s')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->label('User')
+                            ->relationship('user', 'name')
+                            ->live()
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                if ($get('user_id') === null) {
+                                    return;
+                                }
+                                $set('payment.user_id', $get('user_id'));
+                            }),
+                        // ->createOptionForm([
+
+                        Forms\Components\DateTimePicker::make('order_date')
+                            ->label('Order Date')
+                            ->required()
+                            ->native(false)
+                            ->default(now())
+                            ->minDate(now()->subYears(1)),
+
+
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'processing' => 'Processing',
+                                'completed' => 'Completed',
+                                'declined' => 'Declined',
+                            ])
+                            ->required(),
+
+                        Forms\Components\TextInput::make('total_price')
+                            ->label('Total Price (Auto-calculated)')
+                            ->required()
+                            ->numeric()
+                            // ->live()
+                            ->default(0),
+                        // ->disabled(),
+                    ]),
+
                 Forms\Components\Repeater::make('orderDetails')
                     ->label('Order Details')
                     // ->recordComponent(Forms\Components\OrderDetailComponent::class)
@@ -103,39 +147,56 @@ class OrderResource extends Resource
                             }),
                     ]),
 
-                Forms\Components\Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                // ->createOptionForm([
+                Forms\Components\Section::make('Payment')
+                    ->relationship('payment')
+                    ->schema([
+                        Forms\Components\Select::make('payment_method')
+                            ->label('Payment Method')
+                            ->options([
+                                'Credit Card' => 'Credit Card',
+                                'PayPal' => 'PayPal',
+                                'Bank Transfer' => 'Bank Transfer',
+                                'Cash' => 'Cash',
+                            ])
+                            ->required(),
 
-                Forms\Components\DateTimePicker::make('order_date')
-                    ->label('Order Date')
-                    ->required()
-                    ->native(false)
-                    ->default(now())
-                    ->minDate(now()->subYears(1)),
+                        Forms\Components\Select::make('payment_status')
+                            ->label('Payment Status')
+                            ->options([
+                                'Paid' => 'Paid',
+                                'Pending' => 'Pending',
+                                'Failed' => 'Failed',
+                                'Refunded' => 'Refunded',
+                            ])
+                            ->required(),
 
+                        // Forms\Components\Checkbox::make('user_id_same_as_order')
+                        //     ->label('Same user as order')
+                        //     ->default(false)
+                        //     ->live()
+                        //     ->afterStateUpdated(function (Set $set, Get $get) {
+                        //         $set('user_id', $get('../user_id'));
+                        //     }),
 
-                Forms\Components\Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Processing',
-                        'completed' => 'Completed',
-                        'declined' => 'Declined',
-                    ])
-                    ->required(),
+                        Forms\Components\Select::make('user_id')
+                            ->label('User')
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->preload()
+                            // ->visible(fn(Get $get) => $get('user_id_same_as_order') === false)
+                            ->required()
+                            ->disableOptionWhen(fn(Get $get) => $get('user_id_same_as_order') === true),
+                        // ->when(fn(Get $get) => $get('user_id') !== null),
 
-                Forms\Components\TextInput::make('total_price')
-                    ->label('Total Price')
-                    ->required()
-                    ->numeric()
-                    // ->live()
-                    ->default(0),
-                // ->disabled(),
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Amount (Auto-calculated)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0)
+                            ->readonly(),
+
+                    ]),
             ]);
     }
 
@@ -172,6 +233,14 @@ class OrderResource extends Resource
                     ->label('Total Products')
                     ->counts('orderDetails')
                     ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('payment.payment_method')
+                    ->label('Payment Method')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('payment.payment_status')
+                    ->label('Payment Status')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -189,6 +258,22 @@ class OrderResource extends Resource
                         'processing' => 'Processing',
                         'completed' => 'Completed',
                         'declined' => 'Declined',
+                    ]),
+                Tables\Filters\SelectFilter::make('payment.payment_method')
+                    ->relationship('payment', 'payment_method')
+                    ->options([
+                        'Credit Card' => 'Credit Card',
+                        'PayPal' => 'PayPal',
+                        'Bank Transfer' => 'Bank Transfer',
+                        'Cash' => 'Cash',
+                    ]),
+                Tables\Filters\SelectFilter::make('payment.payment_status')
+                    ->relationship('payment', 'payment_status')
+                    ->options([
+                        'Paid' => 'Paid',
+                        'Pending' => 'Pending',
+                        'Failed' => 'Failed',
+                        'Refunded' => 'Refunded',
                     ]),
                 Filter::make('order_date')
                     ->form([

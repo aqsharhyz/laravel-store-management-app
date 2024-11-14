@@ -16,7 +16,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function payments()
+    public function payment()
     {
         return $this->hasOne(Payment::class);
     }
