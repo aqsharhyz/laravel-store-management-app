@@ -58,11 +58,11 @@ class DatabaseSeeder extends Seeder
         DB::table('products')->insert($products);
 
         $orders = [
-            ['user_id' => 1, 'order_date' => now(), 'status' => 'pending', 'total_price' => 40],
+            ['user_id' => 1, 'order_date' => now()->subDays(1), 'status' => 'completed', 'total_price' => 100],
             ['user_id' => 2, 'order_date' => now(), 'status' => 'pending', 'total_price' => 50],
             ['user_id' => 3, 'order_date' => now(), 'status' => 'pending', 'total_price' => 60],
-            ['user_id' => 4, 'order_date' => now(), 'status' => 'pending', 'total_price' => 70],
-            ['user_id' => 5, 'order_date' => now(), 'status' => 'pending', 'total_price' => 80],
+            ['user_id' => 4, 'order_date' => now()->subDays(2), 'status' => 'completed', 'total_price' => 70],
+            ['user_id' => 1, 'order_date' => now()->subDays(3), 'status' => 'declined', 'total_price' => 80],
         ];
 
         DB::table('orders')->insert($orders);
@@ -77,8 +77,45 @@ class DatabaseSeeder extends Seeder
 
         DB::table('order_details')->insert($orderDetails);
 
-        $payments = [];
+        // $table->foreignId('order_id')->constrained(table: 'orders', column: 'id')->cascadeOnDelete();
+        //     $table->foreignId('user_id')->constrained(table: 'users', column: 'id')->cascadeOnDelete();
+        //     $table->enum('payment_method', ['Credit Card', 'PayPal', 'Bank Transfer', 'Cash']);
+        //     $table->decimal('amount', 10, 2);
+        //     $table->enum('payment_status', ['Paid', 'Pending', 'Failed', 'Refunded']);
+        $payments = [
+            ['order_id' => 1, 'user_id' => 1, 'payment_method' => 'Credit Card', 'amount' => 100, 'payment_status' => 'Paid'],
+            ['order_id' => 2, 'user_id' => 2, 'payment_method' => 'PayPal', 'amount' => 50, 'payment_status' => 'Pending'],
+            ['order_id' => 3, 'user_id' => 3, 'payment_method' => 'Bank Transfer', 'amount' => 60, 'payment_status' => 'Pending'],
+            ['order_id' => 4, 'user_id' => 4, 'payment_method' => 'Cash', 'amount' => 70, 'payment_status' => 'Paid'],
+            ['order_id' => 5, 'user_id' => 1, 'payment_method' => 'Credit Card', 'amount' => 80, 'payment_status' => 'Failed'],
+        ];
 
         DB::table('payments')->insert($payments);
+
+        $shipper = [
+            ['name' => 'FedEx'],
+            ['name' => 'UPS'],
+            ['name' => 'DHL'],
+            ['name' => 'USPS'],
+            ['name' => 'Royal Mail'],
+        ];
+
+        DB::table('shippers')->insert($shipper);
+
+        // $table->foreignId('order_id')->constrained();
+        //     $table->string('shipping_address');
+        //     $table->string('tracking_number')->nullable();
+        //     $table->dateTime('estimated_delivery_date')->nullable();
+        //     $table->dateTime('actual_delivery_date')->nullable();
+        // $table->foreignId('shipper_id')->constrained('shippers')->onDelete('cascade');
+        $shipment = [
+            ['order_id' => 1, 'shipping_address' => '123 Main St', 'tracking_number' => '123456', 'estimated_delivery_date' => now()->addDays(5), 'actual_delivery_date' => now()->addDays(5), 'shipper_id' => 1],
+            ['order_id' => 2, 'shipping_address' => '456 Elm St', 'tracking_number' => '456789', 'estimated_delivery_date' => now()->addDays(3), 'actual_delivery_date' => now()->addDays(3), 'shipper_id' => 2],
+            ['order_id' => 3, 'shipping_address' => '789 Oak St', 'tracking_number' => '789012', 'estimated_delivery_date' => now()->addDays(4), 'actual_delivery_date' => now()->addDays(4), 'shipper_id' => 3],
+            ['order_id' => 4, 'shipping_address' => '012 Pine St', 'tracking_number' => '012345', 'estimated_delivery_date' => now()->addDays(6), 'actual_delivery_date' => now()->addDays(6), 'shipper_id' => 2],
+            ['order_id' => 5, 'shipping_address' => '345 Cedar St', 'tracking_number' => '345678', 'estimated_delivery_date' => now()->addDays(7), 'actual_delivery_date' => now()->addDays(7), 'shipper_id' => 4],
+        ];
+
+        DB::table('shipments')->insert($shipment);
     }
 }

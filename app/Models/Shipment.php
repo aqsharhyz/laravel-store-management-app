@@ -10,4 +10,9 @@ class Shipment extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function shipper()
+    {
+        return $this->belongsTo(Shipper::class);
+    }
 }

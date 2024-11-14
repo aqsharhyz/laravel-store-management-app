@@ -39,6 +39,9 @@ class ShipmentResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('tracking_number')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('shipper_id')
+                    ->required()
+                    ->numeric(),
                 Forms\Components\DateTimePicker::make('estimated_delivery_date'),
                 Forms\Components\DateTimePicker::make('actual_delivery_date'),
             ]);
@@ -55,6 +58,9 @@ class ShipmentResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tracking_number')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('shipper_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('estimated_delivery_date')
                     ->dateTime()
                     ->sortable(),

@@ -198,6 +198,13 @@ class OrderResource extends Resource
                             ->required()
                             ->maxLength(255),
 
+                        Forms\Components\Select::make('shipper_id')
+                            ->label('Shipper')
+                            ->relationship('shipper', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
                         Forms\Components\DateTimePicker::make('estimated_delivery_date')
                             ->label('Estimated Delivery Date')
                             ->native(false),
@@ -273,6 +280,11 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('shipment.shipping_address')
                     ->label('Shipping Address')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shipment.shipper.name')
+                    ->label('Shipper')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

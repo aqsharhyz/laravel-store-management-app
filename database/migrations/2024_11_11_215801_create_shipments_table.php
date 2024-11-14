@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('tracking_number')->nullable();
             $table->dateTime('estimated_delivery_date')->nullable();
             $table->dateTime('actual_delivery_date')->nullable();
+            $table->foreignId('shipper_id')->constrained('shippers')->onDelete('cascade');
             // $table->enum('status', ['pending', 'shipped', 'delivered', 'returned'])->default('pending');
             // $table->enum('shipping_method', ['standard', 'express', 'overnight'])->default('standard');
             // $table->foreignId('carrier_id')->constrained('carriers')->onDelete('cascade');
-            // $table->foreignId('shipper_id')->constrained('shippers')->onDelete('cascade');
             // $table->text('notes')->nullable();
             // penyerahan barang ke ekspedisi
             // $table->dateTime('shipped_at')->nullable();
