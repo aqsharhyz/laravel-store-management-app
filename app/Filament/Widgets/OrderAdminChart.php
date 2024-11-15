@@ -16,6 +16,7 @@ class OrderAdminChart extends ChartWidget
     protected function getData(): array
     {
         $data = Trend::model(Order::class)
+            ->dateColumn('order_date')
             ->between(
                 start: now()->startOfMonth(),
                 end: now()->endOfMonth(),
