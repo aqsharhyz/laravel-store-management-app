@@ -21,12 +21,15 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        DB::table('users')->delete();
-        DB::table('categories')->delete();
-        DB::table('products')->delete();
-        DB::table('orders')->delete();
-        DB::table('order_details')->delete();
+        DB::table('wishlists')->delete();
+        DB::table('shipments')->delete();
+        DB::table('shippers')->delete();
         DB::table('payments')->delete();
+        DB::table('order_details')->delete();
+        DB::table('orders')->delete();
+        DB::table('products')->delete();
+        DB::table('categories')->delete();
+        DB::table('users')->delete();
 
         User::create([
             'name' => 'admin',
@@ -117,5 +120,18 @@ class DatabaseSeeder extends Seeder
         ];
 
         DB::table('shipments')->insert($shipment);
+
+        $wishlist = [
+            ['user_id' => 1, 'product_id' => 1],
+            ['user_id' => 2, 'product_id' => 2],
+            ['user_id' => 3, 'product_id' => 3],
+            ['user_id' => 4, 'product_id' => 4],
+            ['user_id' => 1, 'product_id' => 5],
+            ['user_id' => 2, 'product_id' => 1],
+            ['user_id' => 3, 'product_id' => 2],
+            ['user_id' => 4, 'product_id' => 3],
+        ];
+
+        DB::table('wishlists')->insert($wishlist);
     }
 }

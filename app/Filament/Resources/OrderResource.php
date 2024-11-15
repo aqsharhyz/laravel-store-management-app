@@ -38,6 +38,17 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'pending')->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'success';
+        // return static::getModel()::count() > 10 ? 'warning' : 'success';
+    }
+
     public static function form(Form $form): Form
     {
         function calculateTotalPrice(Set $set, Get $get)
@@ -315,7 +326,8 @@ class OrderResource extends Resource
                         'processing' => 'Processing',
                         'completed' => 'Completed',
                         'declined' => 'Declined',
-                    ]),
+                    ])
+                    ->indicator('Status'),
 
                 Tables\Filters\SelectFilter::make('payments')
                     ->label('Payment Method')
