@@ -158,5 +158,18 @@ class DatabaseSeeder extends Seeder
         ];
 
         DB::table('wishlists')->insert($wishlist);
+
+        $carts = [
+            ['user_id' => 1, 'product_id' => 1, 'quantity' => 1],
+            ['user_id' => 2, 'product_id' => 2, 'quantity' => 2],
+            ['user_id' => 3, 'product_id' => 3, 'quantity' => 3],
+            ['user_id' => 4, 'product_id' => 4, 'quantity' => 4],
+            ['user_id' => 1, 'product_id' => 5, 'quantity' => 5],
+            ['user_id' => 2, 'product_id' => 1, 'quantity' => 1],
+            ['user_id' => 3, 'product_id' => 2, 'quantity' => 2],
+            ['user_id' => 4, 'product_id' => 3, 'quantity' => 3],
+        ];
+
+        DB::table('carts')->insert($carts);
     }
 }
