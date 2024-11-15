@@ -1,6 +1,6 @@
 Bug
 
--   order widget
+-   unique
 
 Features
 

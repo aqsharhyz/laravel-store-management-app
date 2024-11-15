@@ -361,21 +361,14 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('payments')
                     ->label('Payment Method')
                     ->relationship('payment', 'payment_method')
-                    ->options([
-                        'Credit Card' => 'Credit Card',
-                        'PayPal' => 'PayPal',
-                        'Bank Transfer' => 'Bank Transfer',
-                        'Cash' => 'Cash',
-                    ]),
+                    ->searchable()
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('payment.payment_status')
                     ->label('Payment Status')
                     ->relationship('payment', 'payment_status')
-                    ->options([
-                        'Paid' => 'Paid',
-                        'Pending' => 'Pending',
-                        'Failed' => 'Failed',
-                        'Refunded' => 'Refunded',
-                    ]),
+                    ->searchable()
+                    ->preload(),
 
                 Filter::make('order_date')
                     ->form([

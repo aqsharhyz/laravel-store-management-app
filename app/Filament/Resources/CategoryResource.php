@@ -34,6 +34,7 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->required()
+                    ->unique()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->label('Description')

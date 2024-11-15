@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained();
+            //! unique order_id
             $table->string('shipping_address');
             $table->string('tracking_number')->nullable();
             $table->dateTime('estimated_delivery_date')->nullable();

@@ -31,6 +31,7 @@ class CityResource extends Resource
     {
         return $form
             ->schema([
+                //! unique [name, province_id]
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
