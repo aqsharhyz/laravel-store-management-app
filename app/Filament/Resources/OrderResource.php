@@ -6,6 +6,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\City;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
@@ -216,6 +217,24 @@ class OrderResource extends Resource
                             ->preload()
                             ->required(),
 
+                        Forms\Components\Select::make('province_id')
+                            ->label('Province')
+                            ->relationship('province', 'name')
+                            ->live()
+                            ->searchable()
+                            ->preload()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $set('city_id', null);
+                            }),
+
+                        Forms\Components\Select::make('city_id')
+                            ->label('City')
+                            ->options(fn(Get $get): Collection => City::query()
+                                ->where('province_id', $get('province_id'))
+                                ->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+
                         Forms\Components\DateTimePicker::make('estimated_delivery_date')
                             ->label('Estimated Delivery Date')
                             ->native(false),
@@ -296,6 +315,16 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('shipment.shipper.name')
                     ->label('Shipper')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shipment.province.name')
+                    ->label('Province')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shipment.city.name')
+                    ->label('City')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

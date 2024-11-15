@@ -23,9 +23,9 @@ class ShipmentResource extends Resource
 
     protected static ?string $modelLabel = 'Shipment';
 
-    protected static ?string $navigationGroup = 'Order Management';
+    protected static ?string $navigationGroup = 'Shipment Management';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -39,11 +39,15 @@ class ShipmentResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('tracking_number')
                     ->maxLength(255),
+                Forms\Components\DateTimePicker::make('estimated_delivery_date'),
+                Forms\Components\DateTimePicker::make('actual_delivery_date'),
                 Forms\Components\TextInput::make('shipper_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\DateTimePicker::make('estimated_delivery_date'),
-                Forms\Components\DateTimePicker::make('actual_delivery_date'),
+                Forms\Components\TextInput::make('city_id')
+                    ->numeric(),
+                Forms\Components\TextInput::make('province_id')
+                    ->numeric(),
             ]);
     }
 
@@ -58,14 +62,20 @@ class ShipmentResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tracking_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('shipper_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('estimated_delivery_date')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('actual_delivery_date')
                     ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('shipper_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('city_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('province_id')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

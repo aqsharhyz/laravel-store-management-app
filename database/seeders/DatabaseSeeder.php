@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
         DB::table('wishlists')->delete();
         DB::table('shipments')->delete();
         DB::table('shippers')->delete();
+        DB::table('cities')->delete();
+        DB::table('provinces')->delete();
         DB::table('payments')->delete();
         DB::table('order_details')->delete();
         DB::table('orders')->delete();
@@ -94,6 +96,29 @@ class DatabaseSeeder extends Seeder
         ];
 
         DB::table('payments')->insert($payments);
+
+        $json = file_get_contents(database_path('seeders/provinces.json'));
+        $data = json_decode($json, true);
+        $provinces = array_map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'name' => $item['name'],
+            ];
+        }, $data);
+        // DB::table('provinces')->insert(['id' => 1, 'name' => 'Unknown']);
+        DB::table('provinces')->insert($provinces);
+
+        $json = file_get_contents(database_path('seeders/regencies.json'));
+        $data = json_decode($json, true);
+        $data = array_map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'name' => $item['name'],
+                'province_id' => $item['province_id'],
+            ];
+        }, $data);
+        // DB::table('cities')->insert(['id' => 1, 'name' => 'Unknown', 'province_id' => 1]);
+        DB::table('cities')->insert($data);
 
         $shipper = [
             ['name' => 'FedEx'],

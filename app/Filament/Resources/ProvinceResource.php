@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ShipperResource\Pages;
-use App\Filament\Resources\ShipperResource\RelationManagers;
-use App\Models\Shipper;
+use App\Filament\Resources\ProvinceResource\Pages;
+use App\Filament\Resources\ProvinceResource\RelationManagers;
+use App\Models\Province;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,19 +13,19 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ShipperResource extends Resource
+class ProvinceResource extends Resource
 {
-    protected static ?string $model = Shipper::class;
+    protected static ?string $model = Province::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-asia-australia';
 
-    protected static ?string $navigationLabel = 'Shipper';
+    protected static ?string $navigationLabel = 'Province';
 
-    protected static ?string $modelLabel = 'Shipper';
+    protected static ?string $modelLabel = 'Province';
 
     protected static ?string $navigationGroup = 'Shipment Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -41,6 +41,10 @@ class ShipperResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -75,9 +79,9 @@ class ShipperResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListShippers::route('/'),
-            'create' => Pages\CreateShipper::route('/create'),
-            'edit' => Pages\EditShipper::route('/{record}/edit'),
+            'index' => Pages\ListProvinces::route('/'),
+            'create' => Pages\CreateProvince::route('/create'),
+            'edit' => Pages\EditProvince::route('/{record}/edit'),
         ];
     }
 }

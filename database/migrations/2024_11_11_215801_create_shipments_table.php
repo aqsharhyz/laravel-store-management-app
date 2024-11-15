@@ -19,6 +19,8 @@ return new class extends Migration
             $table->dateTime('estimated_delivery_date')->nullable();
             $table->dateTime('actual_delivery_date')->nullable();
             $table->foreignId('shipper_id')->constrained('shippers')->onDelete('cascade');
+            $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('cascade');
+            $table->foreignId('province_id')->nullable()->constrained('provinces')->onDelete('cascade');
             // $table->enum('status', ['pending', 'shipped', 'delivered', 'returned'])->default('pending');
             // $table->enum('shipping_method', ['standard', 'express', 'overnight'])->default('standard');
             // $table->foreignId('carrier_id')->constrained('carriers')->onDelete('cascade');

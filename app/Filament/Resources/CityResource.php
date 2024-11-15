@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ShipperResource\Pages;
-use App\Filament\Resources\ShipperResource\RelationManagers;
-use App\Models\Shipper;
+use App\Filament\Resources\CityResource\Pages;
+use App\Filament\Resources\CityResource\RelationManagers;
+use App\Models\City;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,19 +13,19 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ShipperResource extends Resource
+class CityResource extends Resource
 {
-    protected static ?string $model = Shipper::class;
+    protected static ?string $model = City::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
+    protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationLabel = 'Shipper';
+    protected static ?string $navigationLabel = 'City';
 
-    protected static ?string $modelLabel = 'Shipper';
+    protected static ?string $modelLabel = 'City';
 
     protected static ?string $navigationGroup = 'Shipment Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -34,6 +34,11 @@ class ShipperResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('province_id')
+                    ->relationship('province', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
             ]);
     }
 
@@ -41,8 +46,16 @@ class ShipperResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('province.name')
+                    ->label('Province')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -75,9 +88,9 @@ class ShipperResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListShippers::route('/'),
-            'create' => Pages\CreateShipper::route('/create'),
-            'edit' => Pages\EditShipper::route('/{record}/edit'),
+            'index' => Pages\ListCities::route('/'),
+            'create' => Pages\CreateCity::route('/create'),
+            'edit' => Pages\EditCity::route('/{record}/edit'),
         ];
     }
 }
