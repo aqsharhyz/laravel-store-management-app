@@ -24,7 +24,7 @@ class WishlistResource extends Resource
 
     protected static ?string $modelLabel = 'Wishlist';
 
-    protected static ?string $navigationGroup = 'Product Management';
+    protected static ?string $navigationGroup = 'User Management';
 
     protected static ?int $navigationSort = 3;
 

@@ -52,10 +52,11 @@ class UserResource extends Resource
                     ->label('Email')
                     ->searchable()
                     ->sortable(),
-                // Tables\Columns\TextColumn::make('role')
-                // ->label('Role')
-                // ->searchable()
-                // ->sortable(),
+                Tables\Columns\TextColumn::make('role')
+                    ->label('Role')
+                    ->formatStateUsing(fn($state) => ucwords($state))
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label('Email Verified At')
                     ->searchable()
@@ -69,12 +70,13 @@ class UserResource extends Resource
 
             ])
             ->filters([
-                // Tables\Filters\SelectFilter::make('role')
-                //     ->label('Role')
-                //     ->options([
-                //         'admin' => 'Admin',
-                //         'user' => 'User',
-                //     ]),
+                Tables\Filters\SelectFilter::make('role')
+                    ->label('Role')
+                    ->options([
+                        'admin' => 'Admin',
+                        'employee' => 'Employee',
+                        'customer' => 'Customer',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),

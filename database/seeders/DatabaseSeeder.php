@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Employee;
 use App\Models\Product;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -31,13 +32,33 @@ class DatabaseSeeder extends Seeder
         DB::table('orders')->delete();
         DB::table('products')->delete();
         DB::table('categories')->delete();
+        DB::table('employees')->delete();
         DB::table('users')->delete();
 
         User::create([
             'name' => 'admin',
             'email' => 'a@g.com',
-            'is_admin' => true,
+            'role' => 'admin',
             'password' => bcrypt('s'),
+        ]);
+
+        User::create([
+            'name' => 'user',
+            'email' => 's@g.com',
+            'role' => 'employee',
+            'password' => bcrypt('s'),
+        ]);
+
+        Employee::create([
+            'user_id' => 2,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'phone_number' => '1234567890',
+            'address' => '123 Main St',
+            'position' => 'Staff',
+            'salary' => 50000,
+            'date_of_birth' => '1990-01-01',
+            'date_of_joining' => '2021-01-01',
         ]);
 
         User::factory(10)->create();

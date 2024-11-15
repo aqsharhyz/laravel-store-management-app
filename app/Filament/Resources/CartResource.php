@@ -17,13 +17,13 @@ class CartResource extends Resource
 {
     protected static ?string $model = Cart::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $navigationLabel = 'Cart';
 
     protected static ?string $modelLabel = 'Cart';
 
-    protected static ?string $navigationGroup = 'Product Management';
+    protected static ?string $navigationGroup = 'User Management';
 
     protected static ?int $navigationSort = 4;
 
