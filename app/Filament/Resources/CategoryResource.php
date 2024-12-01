@@ -41,6 +41,9 @@ class CategoryResource extends Resource
                     ->nullable()
                     ->rows(3),
             ]);
+        // ->after(function ($record) {
+        //     dd($record);
+        // });
     }
 
     public static function table(Table $table): Table
@@ -96,5 +99,10 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    public static function afterCreate($record)
+    {
+        dd($record);
     }
 }
