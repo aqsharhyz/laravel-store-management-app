@@ -141,7 +141,7 @@ class ProductResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Poduct Info')
+                Section::make('Prroduct Info')
                     ->schema([
                         TextEntry::make('name')->label('Name'),
                         TextEntry::make('sku')->label('SKU'),

@@ -7,6 +7,9 @@ use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -34,16 +37,13 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->required()
-                    ->unique()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->label('Description')
                     ->nullable()
                     ->rows(3),
             ]);
-        // ->after(function ($record) {
-        //     dd($record);
-        // });
     }
 
     public static function table(Table $table): Table
@@ -85,10 +85,24 @@ class CategoryResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Category Info')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Name'),
+                        TextEntry::make('description')
+                            ->label('Description'),
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ProductsRelationManager::class,
         ];
     }
 
@@ -99,10 +113,5 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function afterCreate($record)
-    {
-        dd($record);
     }
 }
