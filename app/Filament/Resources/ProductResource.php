@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -41,10 +42,24 @@ class ProductResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                        'discontinue' => 'Discontinue',
+                    ])
+                    ->required(),
+                Forms\Components\RichEditor::make('description')
                     ->label('Description')
                     ->required()
-                    ->rows(3),
+                    ->disableToolbarButtons([
+                        'codeBlock',
+                    ])
+                    ->fileAttachmentsDirectory('images/products-description')
+                    ->fileAttachmentsVisibility('public')
+                    ->disableGrammarly()
+                    ->columnSpan('full'),
+
                 Forms\Components\TextInput::make('sku')
                     ->label('SKU')
                     ->required()
@@ -76,13 +91,22 @@ class ProductResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->nullable(),
                     ]),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'discontinue' => 'Discontinue',
+                Forms\Components\FileUpload::make('images')
+                    ->label('Image')
+                    ->image()
+                    ->imageEditor()
+                    ->imageEditorAspectRatios([
+                        '4:3',
+                        '1:1',
                     ])
-                    ->required(),
+                    ->panelLayout('grid')
+                    ->imageEditorEmptyFillColor('#FFFFFF')
+                    ->directory('images/products')
+                    ->visibility('public')
+                    ->multiple()
+                    ->reorderable()
+                    ->appendFiles(),
+                // ->columnSpan('full'),
             ]);
     }
 
@@ -109,6 +133,15 @@ class ProductResource extends Resource
                     ->numeric(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('category.name'),
+                Tables\Columns\ImageColumn::make('images')
+                    // ->url(fn($record) => $record->images->first()?->url)
+                    // ->directory('images/products')
+                    ->visibility('public')
+                    // ->width('40px')
+                    // ->height('40px')
+                    ->square()
+                    ->limit(3)
+                    ->limitedRemainingText(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -141,7 +174,7 @@ class ProductResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Prroduct Info')
+                Section::make('Product Info')
                     ->schema([
                         TextEntry::make('name')->label('Name'),
                         TextEntry::make('sku')->label('SKU'),
@@ -149,9 +182,19 @@ class ProductResource extends Resource
                         TextEntry::make('stock')->label('Stock'),
                         TextEntry::make('status')->label('Status'),
                         TextEntry::make('category.name')->label('Category'),
-                        TextEntry::make('description')->label('Description'),
+                        TextEntry::make('description')
+                            ->label('Description')
+                            ->columnSpan('full')
+                            ->html(),
                         TextEntry::make('created_at')->label('Created At'),
                         TextEntry::make('updated_at')->label('Updated At'),
+                        ImageEntry::make('images')
+                            // ->checkFileExistence(false)
+                            // ->defaultImageUrl(url('/images/placeholder.png')),
+                            ->label('Images')
+                            // ->directory('images/products')
+                            // ->visibility('public'),
+                            ->columnSpan('full'),
                     ])->columns(2)
             ]);
     }

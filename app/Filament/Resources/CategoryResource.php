@@ -39,10 +39,31 @@ class CategoryResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                // Forms\Components\Textarea::make('description')
+                //     ->label('Description')
+                //     ->nullable()
+                //     ->rows(3),
+                Forms\Components\RichEditor::make('description')
                     ->label('Description')
                     ->nullable()
-                    ->rows(3),
+                    ->toolbarButtons([
+                        'h2',
+                        'h3',
+                        'bold',
+                        'italic',
+                        'strike',
+                        'underline',
+                        'link',
+                        'bulletList',
+                        'orderedList',
+                        'blockquote',
+                        'table',
+                        'undo',
+                        'redo',
+                    ]),
+                // ->imageUploadRoute('filament/resources/category-resource/upload-image')
+                // ->imageDeleteRoute('filament/resources/category-resource/delete-image')
+                // ->imageDeleteMethod('DELETE'),
             ]);
     }
 
@@ -54,7 +75,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\TextColumn::make('description')->html(),
                 Tables\Columns\TextColumn::make('products_count')
                     ->label('Total Products')
                     // ->formatStateUsing(function ($state, $record) {
@@ -94,7 +115,8 @@ class CategoryResource extends Resource
                         TextEntry::make('name')
                             ->label('Name'),
                         TextEntry::make('description')
-                            ->label('Description'),
+                            ->label('Description')
+                            ->html(),
                     ]),
             ]);
     }
