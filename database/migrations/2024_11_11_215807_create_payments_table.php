@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            //! order_id
-            $table->foreignId('order_id')->constrained(table: 'orders', column: 'id')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained(table: 'users', column: 'id')->cascadeOnDelete();
+            $table->foreignId('order_id')->constrained(table: 'orders', column: 'id')->onDelete('cascade')->unique();
+            $table->foreignId('user_id')->constrained(table: 'users', column: 'id')->onDelete('cascade');
             $table->enum('payment_method', ['Credit Card', 'PayPal', 'Bank Transfer', 'Cash']);
             $table->decimal('amount', 10, 2);
             $table->enum('payment_status', ['Paid', 'Pending', 'Failed', 'Refunded']);

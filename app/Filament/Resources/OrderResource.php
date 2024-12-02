@@ -140,11 +140,17 @@ class OrderResource extends Resource
                             ->numeric()
                             ->required()
                             ->default(1)
+                            ->minValue(1)
+                            ->maxValue(fn(Get $get) => Product::query()->find($get('product_id'))?->stock ?? 0)
                             ->live()
                             // ->afterStateUpdated(fn(Set $set) => $set('../total_price', fn(Get $get) => (int) $get('quantity') * (float) $get('price_at_purchase'))),
                             ->afterStateUpdated(function (Set $set, Get $get) {
                                 calculateTotalPrice($set, $get);
-                            }),
+                            })
+                            ->helperText('The quantity must not exceed the stock.'),
+                        //! ->validationMessages([
+                        //     'max' => 'The quantity must not exceed the stock. The stock is .',
+                        // ]),
 
                         Forms\Components\TextInput::make('price_at_purchase')
                             ->label('Price at Purchase')
@@ -157,7 +163,19 @@ class OrderResource extends Resource
                             ->afterStateUpdated(function (Set $set, Get $get) {
                                 calculateTotalPrice($set, $get);
                             }),
-                    ]),
+                    ])
+                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        $product = Product::find($data['product_id']);
+                        $product->decrement('stock', $data['quantity']);
+
+                        return $data;
+                    }),
+                // !->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                //     $orderDetail = OrderDetail::find($data['id']);
+                //     $product = Product::find($orderDetail->product_id);
+
+                //     return $data;
+                // }),
 
                 Forms\Components\Section::make('Payment')
                     ->relationship('payment')
@@ -292,7 +310,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('payment.payment_method')
                     ->label('Payment Method')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('payment.payment_status')
                     ->label('Payment Status')
                     ->sortable()
@@ -307,7 +325,7 @@ class OrderResource extends Resource
                     ->label('Tracking Number')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('shipment.shipping_address')
                     ->label('Shipping Address')
                     ->searchable()
@@ -401,6 +419,62 @@ class OrderResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('Order Completed')
+                        ->icon('heroicon-o-printer')
+                        ->action(function (Order $record) {
+                            $record->status = 'completed';
+                            $record->save();
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Order Updated')
+                                ->body('The order status has been updated to completed.')
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('Payment Completed')
+                        ->icon('heroicon-o-printer')
+                        ->action(function (Order $record) {
+
+                            $order = Order::find($record->id)->load('payment');
+
+                            $order->payment->payment_status = 'Paid';
+                            $order->payment->save();
+                            // $record->save();
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Order Updated')
+                                ->body('The payment status has been updated to paid.')
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('status')
+                        ->form([
+                            Forms\Components\Select::make('status')
+                                ->label('Status')
+                                ->required()
+                                ->default(function (Order $record) {
+                                    return $record->status;
+                                })
+                                ->options([
+                                    'pending' => 'Pending',
+                                    'processing' => 'Processing',
+                                    'completed' => 'Completed',
+                                    'declined' => 'Declined',
+                                ]),
+                        ])->requiresConfirmation()
+                        ->action(function (Order $record, array $data) {
+                            $record->status = $data['status'];
+                            $record->save();
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Order Updated')
+                                // ->body   ('The order status has been updated to ' . $arguments['status'] . '.')
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
