@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Exports\ProductExporter;
+use App\Filament\Imports\ProductImporter;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
@@ -15,6 +16,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -114,6 +116,8 @@ class ProductResource extends Resource
     {
         return $table
             ->headerActions([
+                ImportAction::make()
+                    ->importer(ProductImporter::class),
                 ExportAction::make()
                     ->exporter(ProductExporter::class)
                     ->modifyQueryUsing(fn(Builder $query, array $options) => isset($options['status']) ? $query->where('status', $options['status']) : $query)
