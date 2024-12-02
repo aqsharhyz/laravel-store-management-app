@@ -20,7 +20,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -39,6 +41,37 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $recordTitleAttribute = 'id';
+
+    protected static int $globalSearchResultsLimit = 3;
+
+    public static function getGlobalSearchResultTitle(Model $record): string | Htmlable
+    {
+        return $record->id;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['id', 'user.name', 'shipment.tracking_number'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'User' => $record->user->name,
+            'Status' => $record->status,
+            'Total Price' => $record->total_price,
+            'Order Date' => $record->order_date,
+            'Tracking Number' => $record->shipment->tracking_number,
+            // payment
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['shipment', 'user']);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where('status', 'pending')->count();
@@ -46,8 +79,8 @@ class OrderResource extends Resource
 
     public static function getNavigationBadgeColor(): string|array|null
     {
-        return 'success';
-        // return static::getModel()::count() > 10 ? 'warning' : 'success';
+        // return 'success';
+        return static::getModel()::count() > 10 ? 'warning' : 'success';
     }
 
     public static function form(Form $form): Form
