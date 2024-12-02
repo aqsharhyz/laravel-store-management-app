@@ -30,6 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile(EditProfile::class, isSimple: false)
             ->databaseNotifications()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            // ->globalSearchDebounce('750ms')
             ->colors([
                 'danger' => Color::Red,
                 'gray' => Color::Slate,

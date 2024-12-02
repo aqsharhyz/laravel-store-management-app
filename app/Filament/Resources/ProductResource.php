@@ -9,6 +9,7 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -18,7 +19,9 @@ use Filament\Tables;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
@@ -34,6 +37,41 @@ class ProductResource extends Resource
     protected static ?string $navigationGroup = 'Product Management';
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static int $globalSearchResultsLimit = 20;
+
+    public static function getGlobalSearchResultTitle(Model $record): string | Htmlable
+    {
+        return $record->name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'sku'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'SKU' => $record->sku,
+            'Category' => $record->category->name,
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['category']);
+    }
+
+    // public static function getGlobalSearchResultActions(Model $record): array
+    // {
+    //     return [
+    //         Action::make('edit')
+    //             ->url(static::getUrl('edit', ['record' => $record])),
+    //     ];
+    // }
 
     public static function form(Form $form): Form
     {
