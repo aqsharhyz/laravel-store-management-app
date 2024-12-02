@@ -194,6 +194,7 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'active' => 'Active',
@@ -204,10 +205,20 @@ class ProductResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
+                        ->requiresConfirmation()
+                        ->modalDescription('Delete product can lead to data inconsistency in other parts of the application. Inactivate or discontinue the product instead if you want to keep the data.')
+                        ->modalSubmitActionLabel('Delete it with all consequences'),
+                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -234,10 +245,17 @@ class ProductResource extends Resource
                             // ->checkFileExistence(false)
                             // ->defaultImageUrl(url('/images/placeholder.png')),
                             ->label('Images')
-                            // ->directory('images/products')
                             // ->visibility('public'),
                             ->columnSpan('full'),
                     ])->columns(2)
+            ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
             ]);
     }
 

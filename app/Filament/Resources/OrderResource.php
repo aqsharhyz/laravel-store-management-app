@@ -400,6 +400,7 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -507,11 +508,15 @@ class OrderResource extends Resource
                                 ->send();
                         }),
                     Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+                    Tables\Actions\ForceDeleteAction::make()->requiresConfirmation(),
+                    Tables\Actions\RestoreAction::make(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -560,6 +565,14 @@ class OrderResource extends Resource
                         TextEntry::make('shipment.estimated_delivery_date')->label('Estimated Delivery Date'),
                         TextEntry::make('shipment.actual_delivery_date')->label('Actual Delivery Date'),
                     ])->columns(2),
+            ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
             ]);
     }
 

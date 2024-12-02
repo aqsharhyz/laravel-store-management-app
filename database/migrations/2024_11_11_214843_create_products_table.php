@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('stock');
             $table->enum('status', ['active', 'inactive', 'discontinue']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
