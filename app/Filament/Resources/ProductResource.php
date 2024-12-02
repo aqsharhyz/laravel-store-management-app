@@ -21,8 +21,10 @@ use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class ProductResource extends Resource
 {
@@ -214,8 +216,27 @@ class ProductResource extends Resource
                     Tables\Actions\RestoreAction::make(),
                 ]),
             ])
+            // ->selectable()
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // ExportAction::make()
+                    //     ->accessSelectedRecords()
+                    //     ->exporter(ProductExporter::class)
+                    //     ->modifyQueryUsing(function (Builder $query, Collection $selectedRecords) {
+                    //         Log::info($selectedRecords->pluck('id'));
+                    //         return $query->whereIn('id', $selectedRecords->pluck('id'));
+                    //     }),
+                    // Tables\Actions\BulkAction::make('Export')
+                    //     ->icon('heroicon-o-printer')
+                    //     // ->accessSelectedRecords()
+                    //     // ->deselectRecordsAfterCompletion()
+                    //     ->action(function (Collection $records) {
+                    //         ExportAction::make()
+                    //             ->exporter(ProductExporter::class)
+                    //             ->modifyQueryUsing(function (Builder $query) use ($records) {
+                    //                 return $query->whereKey($records->pluck('id'));
+                    //             });
+                    //     }),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),

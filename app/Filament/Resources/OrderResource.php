@@ -301,6 +301,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            // ->selectable()
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('Order ID')
@@ -456,7 +457,7 @@ class OrderResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('Order Completed')
                         ->icon('heroicon-o-printer')
-                        ->action(function (Order $record) {
+                        ->action(function (Model $record) {
                             $record->status = 'completed';
                             $record->save();
 
@@ -508,12 +509,33 @@ class OrderResource extends Resource
                                 ->send();
                         }),
                     Tables\Actions\DeleteAction::make()->requiresConfirmation(),
-                    Tables\Actions\ForceDeleteAction::make()->requiresConfirmation(),
+                    Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('Complete Order')
+                        ->icon('heroicon-o-printer')
+                        // ->accessSelectedRecords()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (Collection $records) {
+                            // $selectedRecords->each(
+                            //     fn(Order $selectedRecord) => $selectedRecord->update([
+                            //         'status' => 'completed',
+                            //     ]),
+                            // );
+                            // dd($records);
+                            $records->each->update([
+                                'status' => 'completed',
+                            ]);
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Orders Updated')
+                                ->body('All order status have been updated to completed.')
+                                ->success()
+                                ->send();
+                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
