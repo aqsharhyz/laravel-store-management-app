@@ -9,6 +9,17 @@ class Product extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'sku',
+        'price',
+        'stock',
+        'status',
+        'category_id',
+        'images',
+    ];
+
     protected $casts = [
         'tags' => 'array',
         'images' => 'array',
