@@ -10,6 +10,7 @@ class Product extends Model
     use SoftDeletes;
 
     protected $casts = [
+        'tags' => 'array',
         'images' => 'array',
     ];
 
@@ -31,5 +32,10 @@ class Product extends Model
     public function carts()
     {
         return $this->hasMany(Cart::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
     }
 }

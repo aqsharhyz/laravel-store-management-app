@@ -133,6 +133,21 @@ class ProductResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->nullable(),
                     ]),
+                Forms\Components\Select::make('tags')
+                    ->label('Tags')
+                    ->relationship('tags', 'name')
+                    ->searchable()
+                    ->multiple()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->unique()
+                            ->maxLength(255),
+                    ]),
+                // ->createOptionUsing(function (array $data): int {
+                //     return \App\Models\Tag::create($data)->getKey();
+                // }),
                 Forms\Components\FileUpload::make('images')
                     ->label('Image')
                     ->image()
