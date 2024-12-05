@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Notifications\NewCategory;
+use App\Events\CategoryCreated;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -10,7 +10,7 @@ class Category extends Model
     protected $fillable = ['name', 'description'];
 
     protected $dispatchesEvents = [
-        'created' => NewCategory::class,
+        'created' => CategoryCreated::class,
     ];
 
     public function products()
