@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Models\City;
+use App\Models\Province;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Closure;
+use Filament\Forms\Get;
 
 class CityResource extends Resource
 {
@@ -34,11 +37,24 @@ class CityResource extends Resource
                 //! unique [name, province_id]
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    // ->rules([
+                    //     Rule::unique('your_table_name')->where(function ($query) {
+                    //         return $query->where('province_id', $this->province_id); // Ensure uniqueness for name + province_id
+                    //     })
+                    // ])
+                    ->live()
                     ->maxLength(255),
                 Forms\Components\Select::make('province_id')
                     ->relationship('province', 'name')
                     ->searchable()
                     ->preload()
+                    //! ->rules([
+                    //     fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
+                    //         if ($get('name') === Province::find($value)->name) {
+                    //             $fail("The name has already been taken.");
+                    //         }
+                    //     },
+                    // ])
                     ->required(),
             ]);
     }

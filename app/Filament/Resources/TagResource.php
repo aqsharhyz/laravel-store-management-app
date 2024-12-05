@@ -7,11 +7,14 @@ use App\Filament\Resources\TagResource\RelationManagers;
 use App\Models\Tag;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class TagResource extends Resource
 {
@@ -33,6 +36,21 @@ class TagResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->live()
+                    ->maxLength(255)
+                    ->afterStateUpdated(function (Set $set, $state) {
+                        $set('slug', Str::slug($state));
+                    }),
+                // ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                //     if (($get('slug') ?? '') !== Str::slug($old)) {
+                //         return;
+                //     }
+
+                //     $set('slug', Str::slug($state));
+                // }),
+                Forms\Components\TextInput::make('slug')
+                    ->required()
+                    ->readonly()
                     ->maxLength(255),
             ]);
     }
@@ -43,6 +61,10 @@ class TagResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('products')
                     ->label('Total Products')
                     ->sortable()

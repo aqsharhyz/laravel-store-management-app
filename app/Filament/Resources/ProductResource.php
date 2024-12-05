@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 
 class ProductResource extends Resource
 {
@@ -177,8 +178,13 @@ class ProductResource extends Resource
                     ->exporter(ProductExporter::class)
                     ->modifyQueryUsing(fn(Builder $query, array $options) => isset($options['status']) ? $query->where('status', $options['status']) : $query)
             ])
+            ->query(Product::with('tags'))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    //! remove image
+                    // ->description(fn(Product $record): HtmlString => new HtmlString($record->description))
+                    // ->html()
+                    // ->limit(50)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sku')
@@ -190,8 +196,28 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('stock')
                     ->sortable()
                     ->numeric(),
-                Tables\Columns\TextColumn::make('status'),
+                // Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\IconColumn::make('status')
+                    ->icon(fn(string $state): string => match ($state) {
+                        'active' => 'heroicon-s-check-circle',
+                        'inactive' => 'heroicon-s-x-circle',
+                        'discontinue' => 'heroicon-s-minus-circle',
+                    }),
                 Tables\Columns\TextColumn::make('category.name'),
+
+                // Tables\Columns\TextColumn::make('tags')
+                //     ->label('Tags'),
+                // ->getStateUsing(function ($record) {
+                //     // dd($record);
+                //     // Ensure that the 'tags' relationship is loaded and contains the tags for the product
+                //     if ($record) {
+                //         dd($record);
+                //         return $record;
+                //     }
+                //     return '[]';  // Return an empty string if no tags exist
+                // }),
+                // ->format(fn($record) => $record->tags->pluck('name')->join(', ')),
+                // ->listWithLineBreaks(),
                 Tables\Columns\ImageColumn::make('images')
                     // ->url(fn($record) => $record->images->first()?->url)
                     // ->directory('images/products')

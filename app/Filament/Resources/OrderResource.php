@@ -17,7 +17,9 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
@@ -317,19 +319,17 @@ class OrderResource extends Resource
                     ->label('Order Date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
-                    ->formatStateUsing(function ($state) {
-                        // return match ($state) {
-                        //     'pending' => 'Pending',
-                        //     'processing' => 'Processing',
-                        //     'completed' => 'Completed',
-                        //     'declined' => 'Declined',
-                        //     default => $state,
-                        // };
-                        return ucwords($state);
-                    })
-                    ->sortable(),
+                Tables\Columns\SelectColumn::make('status')
+                    ->label('Order Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'processing' => 'Processing',
+                        'completed' => 'Completed',
+                        'declined' => 'Declined',
+                    ])
+                    ->selectablePlaceholder(false)
+                    ->sortable()
+                    ->rules(['required']),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('Total Price')
                     ->numeric()
@@ -348,6 +348,13 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('payment.payment_status')
                     ->label('Payment Status')
                     ->sortable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'Paid' => 'success',
+                        'Pending' => 'warning',
+                        'Failed' => 'danger',
+                        'Refunded' => 'info',
+                    })
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('payment.amount')
                     ->label('Payment Amount')
@@ -355,10 +362,91 @@ class OrderResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('shipment.tracking_number')
+                // Split::make([
+                //     Tables\Columns\TextInputColumn::make('shipment.tracking_number')
+                //         ->label('Tracking Number')
+                //         ->searchable()
+                //         ->sortable()
+                //         ->rules(['max:255'])
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.shipping_address')
+                //         ->label('Shipping Address')
+                //         ->searchable()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.shipper.name')
+                //         ->label('Shipper')
+                //         ->searchable()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.province.name')
+                //         ->label('Province')
+                //         ->searchable()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.city.name')
+                //         ->label('City')
+                //         ->searchable()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.estimated_delivery_date')
+                //         ->label('Estimated Delivery Date')
+                //         ->dateTime()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                //     Tables\Columns\TextColumn::make('shipment.actual_delivery_date')
+                //         ->label('Actual Delivery Date')
+                //         ->dateTime()
+                //         ->sortable()
+                //         ->toggleable(isToggledHiddenByDefault: true),
+                // ]),
+
+                Tables\Columns\ColumnGroup::make('Shipment')
+                    ->columns([
+                        Tables\Columns\TextInputColumn::make('shipment.tracking_number')
+                            ->label('Tracking Number')
+                            ->searchable()
+                            ->sortable()
+                            ->rules(['max:255'])
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.shipping_address')
+                            ->label('Shipping Address')
+                            ->searchable()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.shipper.name')
+                            ->label('Shipper')
+                            ->searchable()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.province.name')
+                            ->label('Province')
+                            ->searchable()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.city.name')
+                            ->label('City')
+                            ->searchable()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.estimated_delivery_date')
+                            ->label('Estimated Delivery Date')
+                            ->dateTime()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        Tables\Columns\TextColumn::make('shipment.actual_delivery_date')
+                            ->label('Actual Delivery Date')
+                            ->dateTime()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                    ])
+                    ->alignment(Alignment::Center)
+                    ->wrapHeader(),
+                Tables\Columns\TextInputColumn::make('shipment.tracking_number')
                     ->label('Tracking Number')
                     ->searchable()
                     ->sortable()
+                    ->rules(['max:255'])
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('shipment.shipping_address')
                     ->label('Shipping Address')
@@ -455,18 +543,18 @@ class OrderResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('Order Completed')
-                        ->icon('heroicon-o-printer')
-                        ->action(function (Model $record) {
-                            $record->status = 'completed';
-                            $record->save();
+                    // Tables\Actions\Action::make('Order Completed')
+                    //     ->icon('heroicon-o-printer')
+                    //     ->action(function (Model $record) {
+                    //         $record->status = 'completed';
+                    //         $record->save();
 
-                            \Filament\Notifications\Notification::make()
-                                ->title('Order Updated')
-                                ->body('The order status has been updated to completed.')
-                                ->success()
-                                ->send();
-                        }),
+                    //         \Filament\Notifications\Notification::make()
+                    //             ->title('Order Updated')
+                    //             ->body('The order status has been updated to completed.')
+                    //             ->success()
+                    //             ->send();
+                    //     }),
                     Tables\Actions\Action::make('Payment Completed')
                         ->icon('heroicon-o-printer')
                         ->action(function (Order $record) {
@@ -483,31 +571,31 @@ class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    Tables\Actions\Action::make('status')
-                        ->form([
-                            Forms\Components\Select::make('status')
-                                ->label('Status')
-                                ->required()
-                                ->default(function (Order $record) {
-                                    return $record->status;
-                                })
-                                ->options([
-                                    'pending' => 'Pending',
-                                    'processing' => 'Processing',
-                                    'completed' => 'Completed',
-                                    'declined' => 'Declined',
-                                ]),
-                        ])->requiresConfirmation()
-                        ->action(function (Order $record, array $data) {
-                            $record->status = $data['status'];
-                            $record->save();
+                    // Tables\Actions\Action::make('status')
+                    //     ->form([
+                    //         Forms\Components\Select::make('status')
+                    //             ->label('Status')
+                    //             ->required()
+                    //             ->default(function (Order $record) {
+                    //                 return $record->status;
+                    //             })
+                    //             ->options([
+                    //                 'pending' => 'Pending',
+                    //                 'processing' => 'Processing',
+                    //                 'completed' => 'Completed',
+                    //                 'declined' => 'Declined',
+                    //             ]),
+                    //     ])->requiresConfirmation()
+                    //     ->action(function (Order $record, array $data) {
+                    //         $record->status = $data['status'];
+                    //         $record->save();
 
-                            \Filament\Notifications\Notification::make()
-                                ->title('Order Updated')
-                                // ->body   ('The order status has been updated to ' . $arguments['status'] . '.')
-                                ->success()
-                                ->send();
-                        }),
+                    //         \Filament\Notifications\Notification::make()
+                    //             ->title('Order Updated')
+                    //             // ->body   ('The order status has been updated to ' . $arguments['status'] . '.')
+                    //             ->success()
+                    //             ->send();
+                    //     }),
                     Tables\Actions\DeleteAction::make()->requiresConfirmation(),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
@@ -540,7 +628,10 @@ class OrderResource extends Resource
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('order_date', 'desc')
+            //!
+            ->persistSortInSession();
     }
 
     public static function infolist(Infolist $infolist): Infolist
