@@ -33,6 +33,7 @@ class ProvinceResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
             ]);
     }
@@ -47,7 +48,6 @@ class ProvinceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Name')
-                    ->unique()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
