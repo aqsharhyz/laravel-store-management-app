@@ -16,19 +16,19 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            // 'sku' => $this->sku,
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
             'stock' => $this->stock,
-            'weight' => $this->weight,
-            'product_image' => $this->product_image,
+            // 'weight' => $this->weight,
+            // 'product_image' => $this->product_image,
             'category' => $this->whenLoaded('category', function () {
                 return $this->category->name;
             }),
-            'supplier' => $this->whenLoaded('supplier', function () {
-                return $this->supplier->name;
-            }),
+            // 'supplier' => $this->whenLoaded('supplier', function () {
+            //     return $this->supplier->name;
+            // }),
         ];
     }
 }

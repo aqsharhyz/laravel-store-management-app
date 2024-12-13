@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProductRequest;
-use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductCollection;
+use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\JsonResponse;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -22,27 +21,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(CreateProductRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $product = new Product($validated);
-        $product->save();
-
-        return (new ProductCollection($product))->response()->setStatusCode(201);
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(Product $product): ProductCollection
@@ -51,32 +29,15 @@ class ProductController extends Controller
         return new ProductCollection($product);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
+    public function showProductsByCategory(Category $category): ProductCollection
     {
-        //
+        $products = $category->products()->paginate(perPage: 10);
+        return ProductCollection::make($products);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProductRequest $request, Product $product): ProductCollection
+    public function showProductsByTag(Tag $tag): ProductCollection
     {
-        $validated = $request->validated();
-        $product->fill($validated);
-        $product->save();
-
-        return new ProductCollection($product);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product): JsonResponse
-    {
-        $product->delete();
-        return response()->json(['data' => true]);
+        $products = $tag->products()->paginate(perPage: 10);
+        return ProductCollection::make($products);
     }
 }
