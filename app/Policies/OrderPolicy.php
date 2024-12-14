@@ -33,7 +33,7 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return $user->isEmployee();
+        return $user->isEmployee() || $order->user()->is($user);
     }
 
     /**
